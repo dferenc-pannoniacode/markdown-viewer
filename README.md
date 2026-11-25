@@ -26,7 +26,7 @@ Save this example as `compose.ghcr.yaml` beside your `docs` directory, or set `D
 ```yaml
 services:
   viewer:
-    image: ghcr.io/dferenc-pannoniacode/markdown-viewer:${VIEWER_IMAGE_TAG:-v0.9.0-rc3}
+    image: ghcr.io/dferenc-pannoniacode/markdown-viewer:${VIEWER_IMAGE_TAG:-v0.9.0-rc4}
     container_name: markdown-viewer
     ports:
       - "127.0.0.1:${VIEWER_PORT:-8080}:8080"
@@ -47,7 +47,7 @@ docker compose -f compose.ghcr.yaml up -d --pull always
 
 Open [http://localhost:8080](http://localhost:8080). The container mounts `./docs` read-only by default and accepts the same `DOCS_PATH` and `VIEWER_PORT` settings as the local build.
 
-GitHub Actions publishes an image when a version tag is pushed for a commit on `main`. To use the previous release, set `VIEWER_IMAGE_TAG=v0.9.0-rc2` in your environment or `.env` file.
+GitHub Actions publishes an image when a version tag is pushed for a commit on `main`. To use the previous release, set `VIEWER_IMAGE_TAG=v0.9.0-rc3` in your environment or `.env` file.
 
 ## Browse a local folder
 
@@ -62,6 +62,26 @@ Choose **Open folder** in a current browser and select the library root. The fil
 - Relative images support PNG, JPEG, GIF, WebP, AVIF, and BMP. Dotfiles and mounted symbolic links are skipped. Markdown renders with raw HTML disabled.
 - Pick **System**, **Light**, or **Dark** in the toolbar. Your preference is saved in that browser.
 
+### PlantUML diagrams
+
+Put a self-contained diagram between `@startuml` and `@enduml` on their own lines at the top level of a Markdown document.
+
+```markdown
+@startuml
+Alice -> Bob: Hello
+Bob --> Alice: Hi
+@enduml
+```
+
+You can also use a `plantuml` code fence, with or without the tags. The viewer renders diagrams in the browser for mounted libraries and local folders. PlantUML shows syntax errors in the diagram. If the renderer cannot produce an image, the source stays visible.
+
 ## Run locally for development
 
-With the .NET 11 SDK installed, run `dotnet run --project src/MdViewer` and open the address printed by the app. Set `DocumentsDirectory` to an absolute path to use another mounted library outside Docker.
+With the .NET 11 SDK and Node.js installed, run these commands from the repository root and open the address printed by the app.
+
+```sh
+npm ci --prefix src/MdViewer
+dotnet run --project src/MdViewer
+```
+
+Set `DocumentsDirectory` to an absolute path to use another mounted library outside Docker.

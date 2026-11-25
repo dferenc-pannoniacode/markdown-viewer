@@ -1,6 +1,7 @@
 using Markdig;
 using Markdig.Extensions.AutoIdentifiers;
 using Markdig.Helpers;
+using Markdig.Parsers;
 using Markdig.Renderers;
 using Markdig.Renderers.Html;
 using Markdig.Syntax;
@@ -72,6 +73,7 @@ internal static class MarkdownReader
     {
         var builder = new MarkdownPipelineBuilder().DisableHtml().UseAutoIdentifiers(AutoIdentifierOptions.GitHub)
             .UsePipeTables().UseTaskLists().UseEmphasisExtras();
+        builder.BlockParsers.InsertBefore<ParagraphBlockParser>(new PlantUmlBlockParser());
         WikiLinkParser.AddTo(builder);
         return builder.Build();
     }

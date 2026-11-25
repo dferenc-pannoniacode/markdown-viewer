@@ -226,6 +226,7 @@ h1, h2, h3, h4, h5, h6 { scroll-margin-top: 5.5rem; }
 .markdown-body th, .markdown-body td { padding: .5rem .85rem; border: 1px solid var(--line); text-align: left; }
 .markdown-body th { background: var(--panel); }
 .markdown-body img { max-width: 100%; height: auto; }
+.markdown-body .plantuml-diagram { display: block; margin: 1rem 0; border-radius: .4rem; background: #fff; }
 .reader-status { color: var(--muted); }
 .reader-status h1 { color: var(--ink); }
 .notice { padding: .65rem .85rem; background: var(--accent-bg); border-radius: .35rem; }

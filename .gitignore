@@ -1,5 +1,7 @@
 **/bin/
 **/obj/
+**/node_modules/
+/src/MdViewer/wwwroot/plantuml/
 .dotnet-home/
 .verification/
 .vs/

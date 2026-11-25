@@ -15,6 +15,18 @@
     <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="11.0.0" />
     <Content Include="../../docs/**/*" Link="docs/%(RecursiveDir)%(Filename)%(Extension)"
              CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <PlantUmlAsset Include="plantuml.js;viz-global.js;emoji.js;openiconic.js;themes.js;LICENSE" />
+    <Content Remove="wwwroot/plantuml/**" />
+    <Content Include="@(PlantUmlAsset->'wwwroot/plantuml/%(Identity)')" />
   </ItemGroup>
+
+  <Target Name="CopyPlantUmlAssets" BeforeTargets="ResolveProjectStaticWebAssets">
+    <Error Condition="!Exists('node_modules/@plantuml/core/plantuml.js')"
+           Text="PlantUML assets are missing. Run npm ci --prefix src/MdViewer from the repository root." />
+    <Copy SourceFiles="@(PlantUmlAsset->'node_modules/@plantuml/core/%(Identity)')"
+          DestinationFiles="@(PlantUmlAsset->'wwwroot/plantuml/%(Identity)')" SkipUnchangedFiles="true">
+      <Output TaskParameter="CopiedFiles" ItemName="FileWrites" />
+    </Copy>
+  </Target>
 
 </Project>

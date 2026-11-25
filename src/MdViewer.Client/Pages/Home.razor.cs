@@ -81,11 +81,11 @@ public partial class Home : IAsyncDisposable
             pendingScroll = null;
             try
             {
-                await browser!.InvokeVoidAsync("scrollDocument", fragment);
+                await browser!.InvokeVoidAsync("showDocument", fragment);
             }
             catch (JSException)
             {
-                // The document remains available if scrolling fails.
+                // The Markdown is already visible if browser enhancements fail.
             }
         }
 

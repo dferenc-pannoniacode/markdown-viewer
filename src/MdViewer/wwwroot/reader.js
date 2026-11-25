@@ -1,3 +1,5 @@
+import { renderDiagrams } from "./diagrams.js";
+
 const documentLimit = 8 * 1024 * 1024;
 let files = new Map();
 const images = new Map();
@@ -114,7 +116,8 @@ export function goBack() {
     }
 }
 
-export function scrollDocument(fragment) {
+export function showDocument(fragment) {
+    renderDiagrams();
     const savedPosition = history.state?.readerScrollY;
     if (typeof savedPosition === "number") {
         window.scrollTo(0, savedPosition);

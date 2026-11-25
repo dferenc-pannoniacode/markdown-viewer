@@ -1,0 +1,7 @@
+{
+  "name": "md-viewer-assets",
+  "private": true,
+  "dependencies": {
+    "@plantuml/core": "1.2026.10"
+  }
+}
