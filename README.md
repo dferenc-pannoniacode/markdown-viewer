@@ -19,6 +19,36 @@ VIEWER_PORT=8080
 
 Use an existing directory accessible to Docker Desktop. The container opens it read-only, and Compose publishes the viewer on the loopback interface. Refresh the browser after editing, adding, or removing mounted documents.
 
+### Pull the image from GitHub Container Registry
+
+Save this example as `compose.ghcr.yaml` beside your `docs` directory, or set `DOCS_PATH` to an existing Markdown library.
+
+```yaml
+services:
+  viewer:
+    image: ghcr.io/dferenc-pannoniacode/markdown-viewer:${VIEWER_IMAGE_TAG:-v0.9.0-rc2}
+    container_name: markdown-viewer
+    ports:
+      - "127.0.0.1:${VIEWER_PORT:-8080}:8080"
+    environment:
+      DocumentsDirectory: /docs
+    volumes:
+      - type: bind
+        source: ${DOCS_PATH:-./docs}
+        target: /docs
+        read_only: true
+        bind:
+          create_host_path: false
+```
+
+```sh
+docker compose -f compose.ghcr.yaml up -d --pull always
+```
+
+Open [http://localhost:8080](http://localhost:8080). The container mounts `./docs` read-only by default and accepts the same `DOCS_PATH` and `VIEWER_PORT` settings as the local build.
+
+GitHub Actions publishes an image when a version tag is pushed for a commit on `main`. Until `v0.9.0-rc2` is published, set `VIEWER_IMAGE_TAG=v0.9.0-rc1` in your environment or `.env` file to run the previous release.
+
 ## Browse a local folder
 
 Choose **Open folder** in a current browser and select the library root. The file tree preserves nested folders, and the browser reads the files on demand. If you reload or open a local document bookmark in a new tab, choose the same folder again.
