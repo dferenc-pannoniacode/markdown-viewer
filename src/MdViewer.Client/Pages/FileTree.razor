@@ -1,0 +1,27 @@
+<ul class="file-tree">
+    @foreach (var folder in Node.Folders)
+    {
+        <li @key="folder.Path">
+            <details open="@(ActivePath?.StartsWith(folder.Path, StringComparison.Ordinal) is true)">
+                <summary><span class="folder-icon" aria-hidden="true"></span>@folder.Name</summary>
+                <FileTree Node="folder" ActivePath="@ActivePath" Local="Local" OnSelect="OnSelect" />
+            </details>
+        </li>
+    }
+    @foreach (var file in Node.Files)
+    {
+        <li @key="file">
+            <a href="@ViewerUrl.Document(Local, file)" aria-current="@(file == ActivePath ? "page" : null)"
+               title="@file" @onclick="OnSelect">
+                <span class="file-icon" aria-hidden="true"></span>@LibraryPath.FileName(file)
+            </a>
+        </li>
+    }
+</ul>
+
+@code {
+    [Parameter, EditorRequired] public LibraryTree Node { get; set; } = default!;
+    [Parameter] public string? ActivePath { get; set; }
+    [Parameter] public bool Local { get; set; }
+    [Parameter] public EventCallback OnSelect { get; set; }
+}

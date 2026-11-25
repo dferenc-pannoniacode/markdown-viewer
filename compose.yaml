@@ -1,0 +1,14 @@
+services:
+  viewer:
+    build: .
+    ports:
+      - "127.0.0.1:${VIEWER_PORT:-8080}:8080"
+    environment:
+      DocumentsDirectory: /docs
+    volumes:
+      - type: bind
+        source: ${DOCS_PATH:-./docs}
+        target: /docs
+        read_only: true
+        bind:
+          create_host_path: false

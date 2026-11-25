@@ -1,0 +1,122 @@
+@page "/"
+
+<PageTitle>@(activePath is null ? "Markdown Viewer" : $"{LibraryPath.FileName(activePath)} · Markdown Viewer")</PageTitle>
+
+<header class="topbar">
+    <a class="brand" href="@ViewerUrl.Document(IsLocal)">
+        <span class="brand-icon" aria-hidden="true">M</span>
+        <span>
+            Markdown Viewer
+            <span class="brand-version">@AppVersion</span>
+        </span>
+    </a>
+    <div class="toolbar">
+        <label class="theme-control">
+            <span>Theme</span>
+            <select value="@theme" @onchange="ChangeThemeAsync" aria-label="Theme">
+                <option value="system">System</option>
+                <option value="light">Light</option>
+                <option value="dark">Dark</option>
+            </select>
+        </label>
+        <label class="open-folder">
+            <span>Open folder</span>
+            <input @ref="folderInput" type="file" webkitdirectory @onchange="OpenFolderAsync" aria-label="Open folder" />
+        </label>
+    </div>
+</header>
+
+<div class="workspace @(drawerOpen ? "drawer-open" : "")">
+    <button class="drawer-backdrop" type="button" aria-label="Close file tree" @onclick="CloseDrawer"></button>
+    <aside class="sidebar" id="file-sidebar" aria-label="Document library" @onkeydown="HandleDrawerKey">
+        <div class="sidebar-heading">
+            <h2>Library</h2>
+            <button class="drawer-close" type="button" @ref="drawerClose" @onclick="CloseDrawer">Close</button>
+        </div>
+        <nav class="sources" aria-label="Document source">
+            <a href="@ViewerUrl.Document(false)" aria-current="@(!IsLocal ? "page" : null)">Mounted</a>
+            <a href="@ViewerUrl.Document(true)" aria-current="@(IsLocal ? "page" : null)">Local folder</a>
+        </nav>
+        <nav aria-label="Files">
+            @if (tree is { } currentTree && catalog is { Documents.Length: > 0 })
+            {
+                <FileTree @key="currentTree" Node="currentTree" ActivePath="@activePath" Local="IsLocal" OnSelect="CloseDrawer" />
+            }
+            else
+            {
+                <p class="tree-empty">@(loading ? "Loading files…" : "No files to show.")</p>
+            }
+        </nav>
+    </aside>
+    <main class="reader" id="reader">
+        <div class="reader-toolbar">
+            <div class="reader-location">
+                <button class="drawer-toggle" type="button" @ref="drawerToggle" aria-expanded="@drawerOpen.ToString().ToLowerInvariant()"
+                        aria-controls="file-sidebar" @onclick="ToggleDrawer">Files</button>
+                <span class="breadcrumb">@(activePath ?? (IsLocal ? "Local folder" : "Mounted library"))</span>
+            </div>
+            <div class="reader-controls" role="group" aria-label="Reading preferences">
+                <div class="reader-control">
+                    <label for="text-width">Text width</label>
+                    <input id="text-width" type="range" min="@MinTextWidth" max="@MaxTextWidth"
+                           aria-valuetext="@(textWidth)%" disabled="@(browser is null)"
+                           @bind="textWidth" @bind:event="oninput" @onchange="SaveTextWidthAsync" />
+                    <span class="width-value" aria-hidden="true">@(textWidth)%</span>
+                </div>
+                <label class="reader-control">
+                    <span>Paragraph alignment</span>
+                    <select disabled="@(browser is null)" @bind="paragraphAlignment" @bind:after="SaveParagraphAlignmentAsync">
+                        <option value="left">Left aligned</option>
+                        <option value="justify">Justified</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+        @if (notice is not null)
+        {
+            <p class="notice" role="alert">@notice</p>
+        }
+        @if (loading)
+        {
+            <p class="reader-status" role="status">Loading document…</p>
+        }
+        else if (rendered is { } document)
+        {
+            <article class="markdown-body" aria-label="@activePath" style="--text-width: @(textWidth)%"
+                     data-paragraph-alignment="@paragraphAlignment">
+                @((MarkupString)document.Html)
+            </article>
+        }
+        else
+        {
+            <div class="reader-status">
+                <h1>@statusTitle</h1>
+                <p>@statusText</p>
+                @if (matches.Length > 1)
+                {
+                    <ul class="match-list">
+                        @foreach (var match in matches)
+                        {
+                            <li><a href="@ViewerUrl.Document(IsLocal, match, Fragment)">@match</a></li>
+                        }
+                    </ul>
+                }
+                @if (returnUrl is not null)
+                {
+                    <a class="return-link" href="@returnUrl">Back to the document</a>
+                }
+            </div>
+        }
+    </main>
+    @if (rendered is { Sections.Length: > 1 } withSections)
+    {
+        <nav class="outline" aria-label="On this page">
+            <h2>On this page</h2>
+            @foreach (var section in withSections.Sections)
+            {
+                <a class="@(section.Level == 3 ? "subsection" : null)"
+                   href="@ViewerUrl.Document(IsLocal, activePath, section.Id)">@section.Name</a>
+            }
+        </nav>
+    }
+</div>

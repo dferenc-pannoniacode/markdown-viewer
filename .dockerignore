@@ -1,0 +1,8 @@
+**/bin
+**/obj
+.dotnet-home
+.verification
+.git
+.vs
+.env
+
