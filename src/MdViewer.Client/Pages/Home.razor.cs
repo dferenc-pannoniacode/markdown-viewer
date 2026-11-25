@@ -49,6 +49,7 @@ public partial class Home : IAsyncDisposable
     private int textWidth = MaxTextWidth;
     private string paragraphAlignment = "left";
     private bool loading = true;
+    private bool canGoBack;
     private bool drawerOpen;
     private bool focusDrawer;
 
@@ -61,6 +62,7 @@ public partial class Home : IAsyncDisposable
             try
             {
                 browser = await JS.InvokeAsync<IJSObjectReference>("import", "./reader.js");
+                await browser.InvokeVoidAsync("startNavigation");
                 theme = await JS.InvokeAsync<string>("viewerTheme.read");
                 await LoadReadingPreferencesAsync(browser);
                 await LoadAsync();
@@ -114,6 +116,7 @@ public partial class Home : IAsyncDisposable
 
         try
         {
+            canGoBack = await browser!.InvokeAsync<bool>("canGoBack", token);
             var next = local ? localCatalog : await GetMountedCatalogAsync(token);
             token.ThrowIfCancellationRequested();
             if (next != catalog)
@@ -233,6 +236,18 @@ public partial class Home : IAsyncDisposable
 
         response.EnsureSuccessStatusCode();
         return await response.Content.ReadAsStringAsync(token);
+    }
+
+    private async Task GoBackAsync()
+    {
+        try
+        {
+            await browser!.InvokeVoidAsync("goBack");
+        }
+        catch (JSException)
+        {
+            notice = "Couldn’t return to the previous document.";
+        }
     }
 
     private async Task OpenFolderAsync()
@@ -360,6 +375,14 @@ public partial class Home : IAsyncDisposable
         CancelLoad();
         if (browser is not null)
         {
+            try
+            {
+                await browser.InvokeVoidAsync("stopNavigation");
+            }
+            catch (JSDisconnectedException)
+            {
+                // The page has already closed.
+            }
             await browser.DisposeAsync();
         }
     }

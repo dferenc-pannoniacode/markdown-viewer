@@ -11,6 +11,7 @@
         </span>
     </a>
     <div class="toolbar">
+        <button class="back-button" type="button" disabled="@(!canGoBack)" @onclick="GoBackAsync">Back</button>
         <label class="theme-control">
             <span>Theme</span>
             <select value="@theme" @onchange="ChangeThemeAsync" aria-label="Theme">
@@ -83,7 +84,7 @@
         else if (rendered is { } document)
         {
             <article class="markdown-body" aria-label="@activePath" style="--text-width: @(textWidth)%"
-                     data-paragraph-alignment="@paragraphAlignment">
+                     data-paragraph-alignment="@paragraphAlignment" data-default-document="@catalog?.DefaultDocument">
                 @((MarkupString)document.Html)
             </article>
         }

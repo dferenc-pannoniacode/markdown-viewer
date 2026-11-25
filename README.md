@@ -26,7 +26,7 @@ Save this example as `compose.ghcr.yaml` beside your `docs` directory, or set `D
 ```yaml
 services:
   viewer:
-    image: ghcr.io/dferenc-pannoniacode/markdown-viewer:${VIEWER_IMAGE_TAG:-v0.9.0-rc2}
+    image: ghcr.io/dferenc-pannoniacode/markdown-viewer:${VIEWER_IMAGE_TAG:-v0.9.0-rc3}
     container_name: markdown-viewer
     ports:
       - "127.0.0.1:${VIEWER_PORT:-8080}:8080"
@@ -47,7 +47,7 @@ docker compose -f compose.ghcr.yaml up -d --pull always
 
 Open [http://localhost:8080](http://localhost:8080). The container mounts `./docs` read-only by default and accepts the same `DOCS_PATH` and `VIEWER_PORT` settings as the local build.
 
-GitHub Actions publishes an image when a version tag is pushed for a commit on `main`. Until `v0.9.0-rc2` is published, set `VIEWER_IMAGE_TAG=v0.9.0-rc1` in your environment or `.env` file to run the previous release.
+GitHub Actions publishes an image when a version tag is pushed for a commit on `main`. To use the previous release, set `VIEWER_IMAGE_TAG=v0.9.0-rc2` in your environment or `.env` file.
 
 ## Browse a local folder
 
@@ -57,6 +57,7 @@ Choose **Open folder** in a current browser and select the library root. The fil
 
 - Use UTF-8 `.md` files up to 8 MiB. The viewer starts at a root `README.md`, then falls back to the first document alphabetically.
 - Standard links resolve relative to the current file. Links starting with `/` resolve from the library root. Directory links look for `README.md`, and heading fragments use GitHub-style IDs.
+- Use **Back** in the toolbar to return to the previous document and resume reading where you left off.
 - Wiki links support document names, paths, headings, and aliases, such as `[[Guide#First steps|Start here]]`. Names resolve beside the current file first, then across the library. When several files match, choose a path.
 - Relative images support PNG, JPEG, GIF, WebP, AVIF, and BMP. Dotfiles and mounted symbolic links are skipped. Markdown renders with raw HTML disabled.
 - Pick **System**, **Light**, or **Dark** in the toolbar. Your preference is saved in that browser.
